@@ -1,0 +1,57 @@
+---
+title: "DEA_Analysis"
+author: "Pardeepan Subramaniam"
+date: "2023-11-05"
+output:
+  word_document: default
+  html_document: default
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+Statement : 
+
+     Information technology should be mindful of the need for cost reduction sustainability. Data centers can consume energy on a scale comparable to that of industrial facilities and even small towns. Hence, it is essential to implement forward-thinking and transparent energy policies to enhance energy efficiency and overall operational performance. In this context, the use of Data Envelopment Analysis (DEA) to assess energy consumption and performance metrics is recommended. This analysis should encompass a diverse sample of data centers, including those with high and low demands, as well as medium-sized and large facilities. The findings from the DEA analysis will serve as a basis for recommending effective energy policies and will empower data-center managers to identify operational inefficiencies and take corrective actions. 
+
+Summary : Based on my examination and assessment, I have appraised the energy consumption and performance metrics of data centers with the aim of advancing sustainability and reducing costs.
+
+     During this procedure, it is imperative to gather data related to energy usage, performance metrics, and other necessary information for a comprehensive dataset that encompasses various demands and sizes. Defining input and output variables, such as the number of machines, shutdown operations, and energy consumption, becomes a crucial step. My choice of utilizing the "Benchmarking" package for Data Envelopment Analysis (DEA) for both natural DEA and constant returns to scale allows me to determine the efficiency score of data centers. When operations are optimized, the efficiency score reaches 1, while any score lower than 1 indicates inadequacy in the data. To address potential inefficiencies stemming from insufficient values, I have implemented specific techniques to pinpoint the precise requirements for achieving efficiency.
+
+
+Loading the csv file
+
+```{r}
+x=read.csv("C:\\Users\\spard\\OneDrive\\Desktop\\QMM\\Assignment_3\\energy.csv")
+x
+library(Benchmarking)
+library(lpSolveAPI)
+library(ucminf)
+library(quadprog)
+```
+Define the input and output variables for the DEA analysis
+
+```{r}
+ip=x[,c("D.C..Size","Shut.Downs")]
+op =x[,c("Computing.Time..h.", "MWh.Consumed","MWh.Consumed")]
+```
+
+
+The examination is conducted using designated inputs and outputs. The CRS model posits that data centers are functioning at an ideal scale, or any deviations from this ideal scale can be attributed to inefficiencies. In this assessment, our attention can be directed towards the underperforming data centers, those with scores below  1) to identify areas for improvement.
+
+```{r}
+d=dea(ip,op,RTS = "crs")
+d
+```
+
+The 'peers' function is commonly employed to determine the peer units associated with each data center. These peer units serve as benchmarks or reference points for less efficient units to draw insights from. The 'lambda' function computes the relative weights assigned to these peers, indicating the extent to which the performance of benchmarking or reference units should be emulated in order to achieve efficiency.
+
+```{r}
+print(d)
+peers(d)    # It determines the peers For facilities 5,6, the peer units are 1,2,4.
+d_Weights <- lambda(d)   
+#Determine the relative weights assigned to the peers. For facility 4, the weights are 0.20, 0.08, and 0.54. The facility 6 weights are 0.34, 0.39, and 0.13.
+
+d_Weights
+```
+
